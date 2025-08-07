@@ -87,8 +87,8 @@ class Flappy:
         self.player.set_mode(PlayerMode.NORMAL)
 
         while True:
-            # print birds height in real time
-            print(f"Bird position: {self.player.cy:.2f}      ", end="\r")
+            xDistance, yDistance = self.pipes.getNextPipeDistances(self.player.x, self.player.cy)
+            print(f"X dist: {xDistance:.1f}, Y dist: {yDistance:.1f}                 ", end="\r")
 
             if self.player.collided(self.pipes, self.floor):
                 return
