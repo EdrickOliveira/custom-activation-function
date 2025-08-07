@@ -112,12 +112,3 @@ class Pipes(Entity):
                 return xDistance, yDistance
 
         return float("inf"), 0.0
-
-    def getNextGapPosition(self, bird_x: float) -> float:
-        # Returns the Y position of the middle of the gap for the next pipe ahead of the bird
-        for upper, lower in zip(self.upper, self.lower):
-            if upper.x + upper.w > bird_x:
-                return upper.y + upper.h + self.pipe_gap / 2
-        # Fallback: middle of the screen if no pipe ahead
-        return self.config.window.viewport_height / 2
-    
