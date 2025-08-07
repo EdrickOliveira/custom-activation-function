@@ -85,17 +85,10 @@ class Flappy:
     async def play(self):
         self.score.reset()
         self.player.set_mode(PlayerMode.NORMAL)
-        
-        printFlag = True    # variable used to print xDistance only once
 
         while True:
-            # testing initial distance to next pipe
-            xDistance, yDistance = self.pipes.getNextPipeDistances(self.player.x, self.player.cy)
-            if printFlag:
-                print(f"X dist: {xDistance:f}                      ")
-                printFlag = False
-            if xDistance < 3:       # if the next pipe is about to change (it doesn't reach zero)
-                printFlag = True    # print next xDistance (it's the distance between pipes)
+            # print birds height in real time
+            print(f"Bird position: {self.player.cy:.2f}      ", end="\r")
 
             if self.player.collided(self.pipes, self.floor):
                 return
