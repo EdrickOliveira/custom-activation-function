@@ -88,7 +88,8 @@ class Flappy:
 
         while True:
             xDistance, yDistance = self.pipes.getNextPipeDistances(self.player.x, self.player.cy)
-            print(f"X dist: {xDistance:.1f}, Y dist: {yDistance:.1f}                 ", end="\r")
+            gapPosition = self.pipes.getNextGapPosition(self.player.x)
+            print(f"X dist: {xDistance:f}, Y dist: {yDistance:.1f}, Gap at: {gapPosition:.1f}, Y pos: {self.player.cy:.1f}                 ", end="\r")
 
             if self.player.collided(self.pipes, self.floor):
                 return
