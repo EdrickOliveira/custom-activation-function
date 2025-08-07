@@ -102,3 +102,13 @@ class Pipes(Entity):
         )
 
         return upper_pipe, lower_pipe
+
+    def getNextPipeDistances(self, bird_x: float, bird_y: float) -> tuple[float, float]:
+        for upper, lower in zip(self.upper, self.lower):
+            if upper.x + upper.w > bird_x:
+                yGap = upper.y + upper.h + self.pipe_gap / 2
+                xDistance = upper.x + upper.w - bird_x
+                yDistance = yGap - bird_y
+                return xDistance, yDistance
+
+        return float("inf"), 0.0
