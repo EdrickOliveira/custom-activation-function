@@ -1,3 +1,6 @@
+import math
+import random
+
 def normalizeInputs(xDist, yDist):
     #normalize the inputs to be between 0 and 1
     
@@ -9,3 +12,73 @@ def normalizeInputs(xDist, yDist):
     yDist = (yDist + 1) / 2 # yDist is 0.5 when bird and gap are aligned vertically
 
     return xDist, yDist
+
+def neuronFunction(input, weight):
+    aux = math.log((math.e**-weight)+1)
+    aux -= math.log(math.e**(input-weight)+1)
+    aux += input
+    aux *= (weight**2)
+    
+    if aux < 0:
+        return 0
+    return aux
+
+
+class Neuron:
+    def __init__(self):
+        self.value = 0
+        self.bias = 0
+        self.weights = []
+
+class OutputNeuron:
+    def __init__(self):
+        self.value = 0
+        self.bias = 0
+
+class NeuralNetwork:   
+    def __init__(self):
+        # 2 input neurons, 2 hidden neurons, 1 output neuron
+        self.inputNeuron = [Neuron(), Neuron()]
+        self.hiddenNeuron = [Neuron(), Neuron()]
+        self.outputNeuron = [OutputNeuron()]
+
+        self.initializeWeights(self.inputNeuron, self.hiddenNeuron)
+        self.initializeWeights(self.hiddenNeuron, self.outputNeuron)
+
+        self.initializeBiases(self.inputNeuron)
+        self.initializeBiases(self.hiddenNeuron)
+        self.initializeBiases(self.outputNeuron)
+    
+    def initializeWeights(self, layer, nextLayer):
+        for neuron in layer:
+            for nextNeuron in nextLayer:
+                neuron.weights.append(random.random()*2)    # random weights between 0 and 2
+
+    def initializeBiases(self, layer):
+        for neuron in layer:
+            neuron.bias = random.random()*2    # random biases between 0 and 2
+
+    def getInputs(self, xDist, yDist):
+        # assign the two input neuron as the distances between the bird and the gap
+        self.inputNeuron[0].value, self.inputNeuron[1].value = normalizeInputs(xDist, yDist)
+
+    def feedForward(self):
+        self.hiddenNeuron[0].value = neuronFunction(self.inputNeuron[0].value, self.inputNeuron[0].weights[0]) + neuronFunction(self.inputNeuron[1].value, self.inputNeuron[1].weights[0]) + self.hiddenNeuron[0].bias
+        self.hiddenNeuron[1].value = neuronFunction(self.inputNeuron[0].value, self.inputNeuron[0].weights[1]) + neuronFunction(self.inputNeuron[1].value, self.inputNeuron[1].weights[1]) + self.hiddenNeuron[1].bias
+
+        self.outputNeuron[0].value = neuronFunction(self.hiddenNeuron[0].value, self.hiddenNeuron[0].weights[0]) + neuronFunction(self.hiddenNeuron[1].value, self.hiddenNeuron[1].weights[0]) + self.outputNeuron[0].bias
+
+    def flap(self):
+        if self.outputNeuron[0].value < 10: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 10 (~half) just for now (jumps if smaller because lower value means the bird is closer to the ground)
+            return True
+        return False
+
+
+
+# example feedforward
+brain = NeuralNetwork()
+brain.getInputs(random.random() * 193, random.random() * 393 - 196.5)  # xDist between 0 and 193, yDist between -196.5 and 196.5
+brain.feedForward()
+print("Input values:", brain.inputNeuron[0].value, brain.inputNeuron[1].value)
+print("Output value:", brain.outputNeuron[0].value)
+print("Flap decision:", brain.flap())
