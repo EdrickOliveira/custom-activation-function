@@ -72,13 +72,3 @@ class NeuralNetwork:
         if self.outputNeuron[0].value < 10: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 10 (~half) just for now (jumps if smaller because lower value means the bird is closer to the ground)
             return True
         return False
-
-
-
-# example feedforward
-brain = NeuralNetwork()
-brain.getInputs(random.random() * 193, random.random() * 393 - 196.5)  # xDist between 0 and 193, yDist between -196.5 and 196.5
-brain.feedForward()
-print("Input values:", brain.inputNeuron[0].value, brain.inputNeuron[1].value)
-print("Output value:", brain.outputNeuron[0].value)
-print("Flap decision:", brain.flap())

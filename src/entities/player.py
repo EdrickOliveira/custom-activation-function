@@ -2,6 +2,7 @@ from enum import Enum
 from itertools import cycle
 
 import pygame
+from ..neuralNetwork.neuralNetwork import NeuralNetwork
 
 from ..utils import GameConfig, clamp
 from .entity import Entity
@@ -29,6 +30,8 @@ class Player(Entity):
         self.crashed = False
         self.crash_entity = None
         self.set_mode(PlayerMode.SHM)
+
+        self.brain = NeuralNetwork()
 
     def set_mode(self, mode: PlayerMode) -> None:
         self.mode = mode

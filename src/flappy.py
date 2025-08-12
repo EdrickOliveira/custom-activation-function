@@ -15,7 +15,7 @@ from .entities import (
     WelcomeMessage,
 )
 from .utils import GameConfig, Images, Sounds, Window
-from .neuralNetwork.neuralNetwork import normalizeInputs
+from .neuralNetwork.neuralNetwork import *
 
 
 class Flappy:
@@ -89,9 +89,9 @@ class Flappy:
 
         while True:
             xDistance, yDistance = self.pipes.getNextPipeDistances(self.player.x, self.player.cy)
-
-            xDistance, yDistance = normalizeInputs(xDistance, yDistance)
-            print(f"X dist: {xDistance:f}, Y dist: {yDistance:f}                 ", end="\r")
+            self.player.brain.getInputs(xDistance, yDistance)
+            self.player.brain.feedForward()
+            print("Output value: ", self.player.brain.outputNeuron[0].value, end="\r")
 
             if self.player.collided(self.pipes, self.floor):
                 return
@@ -100,10 +100,13 @@ class Flappy:
                 if self.player.crossed(pipe):
                     self.score.add()
 
+            if self.player.brain.flap():
+                self.player.flap()
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
                     self.player.flap()
+
 
             self.background.tick()
             self.floor.tick()
