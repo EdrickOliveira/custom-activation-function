@@ -54,6 +54,8 @@ class Flappy:
         self.player.set_mode(PlayerMode.SHM)
 
         while True:
+            return
+            
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
@@ -126,6 +128,8 @@ class Flappy:
         self.floor.stop()
 
         while True:
+            return
+            
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
