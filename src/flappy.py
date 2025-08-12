@@ -39,7 +39,12 @@ class Flappy:
         while True:
             self.background = Background(self.config)
             self.floor = Floor(self.config)
-            self.player = Player(self.config)
+
+            # generate multiple players
+            self.player = []
+            for i in range(1000):
+                self.player.append(Player(self.config))
+
             self.welcome_message = WelcomeMessage(self.config)
             self.game_over_message = GameOver(self.config)
             self.pipes = Pipes(self.config)
@@ -50,12 +55,10 @@ class Flappy:
 
     async def splash(self):
         """Shows welcome splash screen animation of flappy bird"""
-
-        self.player.set_mode(PlayerMode.SHM)
+        for p in self.player:
+            p.set_mode(PlayerMode.SHM)
 
         while True:
-            return
-            
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
@@ -63,7 +66,8 @@ class Flappy:
 
             self.background.tick()
             self.floor.tick()
-            self.player.tick()
+            for p in self.player:
+                p.tick()
             self.welcome_message.tick()
 
             pygame.display.update()
@@ -87,60 +91,70 @@ class Flappy:
 
     async def play(self):
         self.score.reset()
-        self.player.set_mode(PlayerMode.NORMAL)
+        for p in self.player:
+            p.set_mode(PlayerMode.NORMAL)
 
-        while True:
-            xDistance, yDistance = self.pipes.getNextPipeDistances(self.player.x, self.player.cy)
-            self.player.brain.getInputs(xDistance, yDistance)
-            self.player.brain.feedForward()
-            print("Output value: ", self.player.brain.outputNeuron[0].value, end="\r")
+        alive = [True for _ in self.player]
+        while any(alive):
+            for idx, p in enumerate(self.player):
+                if not alive[idx]:
+                    continue
+                xDistance, yDistance = self.pipes.getNextPipeDistances(p.x, p.cy)
+                p.brain.getInputs(xDistance, yDistance)
+                p.brain.feedForward()
+                # Optionally print output for each player
+                print(f"Player {idx} Output value: ", p.brain.outputNeuron[0].value)
 
-            if self.player.collided(self.pipes, self.floor):
-                return
+                if p.collided(self.pipes, self.floor):
+                    alive[idx] = False
+                    continue
 
-            for i, pipe in enumerate(self.pipes.upper):
-                if self.player.crossed(pipe):
-                    self.score.add()
+                for pipe in self.pipes.upper:
+                    if p.crossed(pipe):
+                        self.score.add()
 
-            if self.player.brain.flap():
-                self.player.flap()
+                if p.brain.flap():
+                    p.flap()
+
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
-                    self.player.flap()
-
+                    for idx, p in enumerate(self.player):
+                        if alive[idx]:
+                            p.flap()
 
             self.background.tick()
             self.floor.tick()
             self.pipes.tick()
             self.score.tick()
-            self.player.tick()
+            for p in self.player:
+                p.tick()
 
             pygame.display.update()
             await asyncio.sleep(0)
             self.config.tick()
 
     async def game_over(self):
-        """crashes the player down and shows gameover image"""
-
-        self.player.set_mode(PlayerMode.CRASH)
+        """crashes all players down and shows gameover image"""
+        for p in self.player:
+            p.set_mode(PlayerMode.CRASH)
         self.pipes.stop()
         self.floor.stop()
 
         while True:
-            return
-            
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
-                    if self.player.y + self.player.h >= self.floor.y - 1:
+                    # Only allow restart if all players are on the ground
+                    if all(p.y + p.h >= self.floor.y - 1 for p in self.player):
                         return
 
             self.background.tick()
             self.floor.tick()
             self.pipes.tick()
             self.score.tick()
-            self.player.tick()
+            for p in self.player:
+                p.tick()
             self.game_over_message.tick()
 
             self.config.tick()

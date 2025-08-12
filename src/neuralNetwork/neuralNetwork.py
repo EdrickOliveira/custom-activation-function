@@ -69,6 +69,6 @@ class NeuralNetwork:
         self.outputNeuron[0].value = neuronFunction(self.hiddenNeuron[0].value, self.hiddenNeuron[0].weights[0]) + neuronFunction(self.hiddenNeuron[1].value, self.hiddenNeuron[1].weights[0]) + self.outputNeuron[0].bias
 
     def flap(self):
-        if self.outputNeuron[0].value < 10: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 10 (~half) just for now (jumps if smaller because lower value means the bird is closer to the ground)
+        if self.outputNeuron[0].value < 5: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 10 (~half) just for now (jumps if smaller because lower value means the bird is closer to the ground)
             return True
         return False
