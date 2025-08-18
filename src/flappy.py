@@ -55,8 +55,8 @@ class Flappy:
 
     async def splash(self):
         """Shows welcome splash screen animation of flappy bird"""
-        for p in self.player:
-            p.set_mode(PlayerMode.SHM)
+        for bird in self.player:
+            bird.set_mode(PlayerMode.SHM)
 
         while True:
             for event in pygame.event.get():
@@ -66,8 +66,8 @@ class Flappy:
 
             self.background.tick()
             self.floor.tick()
-            for p in self.player:
-                p.tick()
+            for bird in self.player:
+                bird.tick()
             self.welcome_message.tick()
 
             pygame.display.update()
@@ -91,44 +91,44 @@ class Flappy:
 
     async def play(self):
         self.score.reset()
-        for p in self.player:
-            p.set_mode(PlayerMode.NORMAL)
+        for bird in self.player:
+            bird.set_mode(PlayerMode.NORMAL)
 
         alive = [True for _ in self.player]
         while any(alive):
-            for idx, p in enumerate(self.player):
+            for idx, bird in enumerate(self.player):
                 if not alive[idx]:
                     continue
-                xDistance, yDistance = self.pipes.getNextPipeDistances(p.x, p.cy)
-                p.brain.getInputs(xDistance, yDistance)
-                p.brain.feedForward()
+                xDistance, yDistance = self.pipes.getNextPipeDistances(bird.x, bird.cy)
+                bird.brain.getInputs(xDistance, yDistance)
+                bird.brain.feedForward()
                 # Optionally print output for each player
-                #print(f"Player {idx} Output value: ", p.brain.outputNeuron[0].value)
+                #print(f"Player {idx} Output value: ", bird.brain.outputNeuron[0].value)
 
-                if p.collided(self.pipes, self.floor):
+                if bird.collided(self.pipes, self.floor):
                     alive[idx] = False
                     continue
 
                 for pipe in self.pipes.upper:
-                    if p.crossed(pipe):
+                    if bird.crossed(pipe):
                         self.score.add()
 
-                if p.brain.flap():
-                    p.flap()    # execute the brain's decision to flap
+                if bird.brain.flap():
+                    bird.flap()    # execute the brain's decision to flap
 
             for event in pygame.event.get():
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
-                    for idx, p in enumerate(self.player):
+                    for idx, bird in enumerate(self.player):
                         if alive[idx]:
-                            p.flap()
+                            bird.flap()
 
             self.background.tick()
             self.floor.tick()
             self.pipes.tick()
             self.score.tick()
-            for p in self.player:
-                p.tick()
+            for bird in self.player:
+                bird.tick()
 
             pygame.display.update()
             await asyncio.sleep(0)
@@ -136,8 +136,8 @@ class Flappy:
 
     async def game_over(self):
         """crashes all players down and shows gameover image"""
-        for p in self.player:
-            p.set_mode(PlayerMode.CRASH)
+        for bird in self.player:
+            bird.set_mode(PlayerMode.CRASH)
         self.pipes.stop()
         self.floor.stop()
 
@@ -146,15 +146,15 @@ class Flappy:
                 self.check_quit_event(event)
                 if self.is_tap_event(event):
                     # Only allow restart if all players are on the ground
-                    if all(p.y + p.h >= self.floor.y - 1 for p in self.player):
+                    if all(bird.y + bird.h >= self.floor.y - 1 for bird in self.player):
                         return
 
             self.background.tick()
             self.floor.tick()
             self.pipes.tick()
             self.score.tick()
-            for p in self.player:
-                p.tick()
+            for bird in self.player:
+                bird.tick()
             self.game_over_message.tick()
 
             self.config.tick()
