@@ -2,12 +2,14 @@ import math
 import random
 
 def normalizeInputs(xDist, yDist):
-    #normalize the inputs to be between 0 and 1 (x axis) and -1 and 1 (y axis)
+    #normalize the inputs to be between 0 and 1
     
     xDist /= 193    # max distance (actually 439 at startup. let's see how it goes)
     
     # max distance (difference of position) between the bird and the gap
     yDist /= 393    # this is between -1 and 1 (gap at top with bird at bottom - vice versa), so:
+    yDist += 1    # now it's between 0 and 2
+    yDist /= 2    # now it's between 0 and 1
 
     return xDist, yDist
 
