@@ -103,7 +103,7 @@ class Flappy:
                 p.brain.getInputs(xDistance, yDistance)
                 p.brain.feedForward()
                 # Optionally print output for each player
-                print(f"Player {idx} Output value: ", p.brain.outputNeuron[0].value)
+                #print(f"Player {idx} Output value: ", p.brain.outputNeuron[0].value)
 
                 if p.collided(self.pipes, self.floor):
                     alive[idx] = False
@@ -114,7 +114,7 @@ class Flappy:
                         self.score.add()
 
                 if p.brain.flap():
-                    p.flap()
+                    p.flap()    # execute the brain's decision to flap
 
             for event in pygame.event.get():
                 self.check_quit_event(event)

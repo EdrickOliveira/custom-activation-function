@@ -31,6 +31,7 @@ class Player(Entity):
         self.crash_entity = None
         self.set_mode(PlayerMode.SHM)
 
+        # parameters added by Edrick
         self.brain = NeuralNetwork()
 
     def set_mode(self, mode: PlayerMode) -> None:
