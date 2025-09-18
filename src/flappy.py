@@ -42,7 +42,7 @@ class Flappy:
 
             # generate multiple players
             self.player = []
-            for i in range(1000):
+            for _ in range(1000):
                 self.player.append(Player(self.config))
 
             self.welcome_message = WelcomeMessage(self.config)
@@ -111,7 +111,8 @@ class Flappy:
 
                 for pipe in self.pipes.upper:
                     if bird.crossed(pipe):
-                        self.score.add()
+                        bird.score += 1  # increment bird's individual score when it passes a pipe
+                        self.score.set(bird.score)  # update displayed score to the highest score among alive birds
 
                 if bird.brain.flap():
                     bird.flap()    # execute the brain's decision to flap

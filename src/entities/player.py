@@ -33,6 +33,7 @@ class Player(Entity):
 
         # parameters added by Edrick
         self.brain = NeuralNetwork()
+        self.score = 0
 
     def set_mode(self, mode: PlayerMode) -> None:
         self.mode = mode

@@ -17,6 +17,13 @@ class Score(Entity):
         self.score += 1
         self.config.sounds.point.play()
 
+    # Method added by Edrick
+    # Allows setting score manually. Needed because the game wasn't designed for multiple birds
+    # With "add" method, each bird would increment the score when passing a pipe, causing score to increase too fast
+    def set(self, score):
+        self.score = score
+        self.config.sounds.point.play()
+
     @property
     def rect(self) -> pygame.Rect:
         score_digits = [int(x) for x in list(str(self.score))]
