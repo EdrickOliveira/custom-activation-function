@@ -8,18 +8,19 @@ def normalizeInputs(xDist, yDist):
     
     # max distance (difference of position) between the bird and the gap
     yDist /= 393    # this is between -1 and 1 (gap at top with bird at bottom - vice versa), so:
-    yDist += 1    # now it's between 0 and 2
-    yDist /= 2    # now it's between 0 and 1
+    # let's normalize it to be between 0 and 1
+    yDist = (yDist + 1) / 2 # yDist is 0.5 when bird and gap are aligned vertically
 
     return xDist, yDist
 
 def neuronFunction(input, weight):
     aux = math.log((math.e**-weight)+1)
-    aux -= math.log((math.e**weight)+1)
-    aux += math.log((math.e**(input+weight))+1)
-    aux -= math.log((math.e**(input-weight))+1)
+    aux -= math.log(math.e**(input-weight)+1)
+    aux += input
     aux *= (weight**2)
     
+    if aux < 0:
+        return 0
     return aux
 
 
@@ -51,11 +52,11 @@ class NeuralNetwork:
     def initializeWeights(self, layer, nextLayer):
         for neuron in layer:
             for nextNeuron in nextLayer:
-                neuron.weights.append(random.random()*2-1)    # random weights between -1 and 1
+                neuron.weights.append(random.random()*2)    # random weights between 0 and 2
 
     def initializeBiases(self, layer):
         for neuron in layer:
-            neuron.bias = random.random()*2-1    # random biases between -1 and 1
+            neuron.bias = random.random()*2    # random biases between 0 and 2
 
     def getInputs(self, xDist, yDist):
         # assign the two input neuron as the distances between the bird and the gap
@@ -68,6 +69,6 @@ class NeuralNetwork:
         self.outputNeuron[0].value = neuronFunction(self.hiddenNeuron[0].value, self.hiddenNeuron[0].weights[0]) + neuronFunction(self.hiddenNeuron[1].value, self.hiddenNeuron[1].weights[0]) + self.outputNeuron[0].bias
 
     def flap(self):
-        if self.outputNeuron[0].value > 0:  # jump if output neuron is greater than 0
+        if self.outputNeuron[0].value < 5: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 5 (usual mean output neuron value, when weights and biases are random) just for now (jumps if smaller because lower value means the bird is closer to the ground)
             return True
         return False
