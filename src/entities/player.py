@@ -32,7 +32,7 @@ class Player(Entity):
         self.set_mode(PlayerMode.SHM)
 
         # parameters added by Edrick
-        self.brain = NeuralNetwork()
+        self.brain = NeuralNetwork([2, 2, 1])   # simple neural network with 2 inputs, 2 hidden neurons, and 1 output
         self.score = 0
 
     def set_mode(self, mode: PlayerMode) -> None:

@@ -19,56 +19,58 @@ def neuronFunction(input, weight):
     aux += input
     aux *= (weight**2)
     
-    if aux < 0:
-        return 0
-    return aux
+    return max(0, aux)
 
 
 class Neuron:
-    def __init__(self):
+    def __init__(self, numOutputs):
         self.value = 0
-        self.bias = 0
-        self.weights = []
+        self.bias = random.random() * 2     # Bias is initialized randomly between 0 and 2.
+        self.weights = [random.random() * 2 for _ in range(numOutputs)]     # A list of connection weights to each neuron in the next layer (output's neuron's will have an empty list)
 
-class OutputNeuron:
-    def __init__(self):
-        self.value = 0
-        self.bias = 0
+class NeuralNetwork:
+    def __init__(self, layerSizes):
+        self.layers = []
+        numLayers = len(layerSizes)
 
-class NeuralNetwork:   
-    def __init__(self):
-        # 2 input neurons, 2 hidden neurons, 1 output neuron
-        self.inputNeuron = [Neuron(), Neuron()]
-        self.hiddenNeuron = [Neuron(), Neuron()]
-        self.outputNeuron = [OutputNeuron()]
-
-        self.initializeWeights(self.inputNeuron, self.hiddenNeuron)
-        self.initializeWeights(self.hiddenNeuron, self.outputNeuron)
-
-        self.initializeBiases(self.inputNeuron)
-        self.initializeBiases(self.hiddenNeuron)
-        self.initializeBiases(self.outputNeuron)
-    
-    def initializeWeights(self, layer, nextLayer):
-        for neuron in layer:
-            for nextNeuron in nextLayer:
-                neuron.weights.append(random.random()*2)    # random weights between 0 and 2
-
-    def initializeBiases(self, layer):
-        for neuron in layer:
-            neuron.bias = random.random()*2    # random biases between 0 and 2
+        # Create all layers based on the provided sizes.
+        for i in range(numLayers):
+            isOutputLayer = (i == numLayers - 1)
+            # Neurons in the output layer have 0 outgoing connections.
+            numOutputs = 0 if isOutputLayer else layerSizes[i + 1]
+            
+            # Create a layer (a list of Neuron objects) and add it to the network.
+            layer = [Neuron(numOutputs) for _ in range(layerSizes[i])]
+            self.layers.append(layer)
 
     def getInputs(self, xDist, yDist):
-        # assign the two input neuron as the distances between the bird and the gap
-        self.inputNeuron[0].value, self.inputNeuron[1].value = normalizeInputs(xDist, yDist)
+        # Normalize and set the input values for the network's first layer.
+        norm_x, norm_y = normalizeInputs(xDist, yDist)
+        self.layers[0][0].value = norm_x
+        self.layers[0][1].value = norm_y
 
     def feedForward(self):
-        self.hiddenNeuron[0].value = neuronFunction(self.inputNeuron[0].value, self.inputNeuron[0].weights[0]) + neuronFunction(self.inputNeuron[1].value, self.inputNeuron[1].weights[0]) + self.hiddenNeuron[0].bias
-        self.hiddenNeuron[1].value = neuronFunction(self.inputNeuron[0].value, self.inputNeuron[0].weights[1]) + neuronFunction(self.inputNeuron[1].value, self.inputNeuron[1].weights[1]) + self.hiddenNeuron[1].bias
+        # Iterate through each layer, starting from the first hidden layer (index 1)
+        for i in range(1, len(self.layers)):
+            prevLayer = self.layers[i - 1]
+            currentLayer = self.layers[i]
 
-        self.outputNeuron[0].value = neuronFunction(self.hiddenNeuron[0].value, self.hiddenNeuron[0].weights[0]) + neuronFunction(self.hiddenNeuron[1].value, self.hiddenNeuron[1].weights[0]) + self.outputNeuron[0].bias
+            # For each neuron in the current layer...
+            for j, neuron in enumerate(currentLayer):
+                neuron.value = 0
+                # ...sum the weighted outputs from the previous layer.
+                for prevNeuron in prevLayer:
+                    # Get the weight connecting the previous neuron to the current one.
+                    weight = prevNeuron.weights[j]
+                    neuron.value += neuronFunction(prevNeuron.value, weight)
+                
+                # The neuron's new value is the sum + its bias.
+                neuron.value += neuron.bias
 
     def flap(self):
-        if self.outputNeuron[0].value < 5: # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 5 (usual mean output neuron value, when weights and biases are random) just for now (jumps if smaller because lower value means the bird is closer to the ground)
+        if self.layers[-1][0].value < 5:    # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 5 (usual mean output neuron value, when weights and biases are random) just for now (jumps if smaller because lower value means the bird is closer to the ground)
             return True
-        return False
+        else:
+            return False
+        
+        # PS: array[-1] gets the last element of the array (output layer)
