@@ -72,7 +72,7 @@ class NeuralNetwork:
                 neuron.value += neuron.bias
 
     def flap(self):
-        if self.layers[-1][0].value < 2.5:    # output neuron ranges from 0 to 19 if weight and bias range from 0 to 2 (tested). Jump threshold set as 5 (usual mean output neuron value, when weights and biases are random) just for now (jumps if smaller because lower value means the bird is closer to the ground)
+        if self.layers[-1][0].value < 2.5:
             return True
         else:
             return False
