@@ -41,6 +41,10 @@ class NeuralNetwork:
             
             # Create a layer (a list of Neuron objects) and add it to the network.
             layer = [Neuron(numOutputs) for _ in range(layerSizes[i])]
+            if i == 0:      #the neurons of the input layer don't have biases
+                for neuron in layer:
+                    neuron.bias = 0
+
             self.layers.append(layer)
 
     def getInputs(self, xDist, yDist):
